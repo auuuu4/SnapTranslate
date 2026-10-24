@@ -60,20 +60,34 @@ text translation with multiple providers, clipboard history, and a global-hotkey
 | 剪贴板历史 | ✅ | 暂未迁移 |
 | 全局快捷键与托盘 | ✅ | 暂未迁移 |
 
-## 运行
+## 下载
 
-Windows 10 19041 及以上（64 位），不需要安装 .NET 运行时：
+到 [Releases](https://github.com/auuuu4/SnapTranslate/releases) 页下载对应平台的包，全部由 GitHub Actions 从本仓库源码构建：
+
+| 平台 | 文件 |
+| --- | --- |
+| Windows 10/11 x64 | `SnapTranslate-win-x64.zip`（解压即用，不需要 .NET 运行时） |
+| macOS Apple 芯片 | `SnapTranslate-macos-arm64.zip` |
+| macOS Intel | `SnapTranslate-macos-x64.zip` |
+| 校验 | `SHA256SUMS.txt` |
+
+> Windows 端未做代码签名，首次运行可能提示「已保护你的电脑」，选择「更多信息 → 仍要运行」。
+> macOS 端未做 Apple 开发者签名，首次打开请右键选「打开」，或先执行 `xattr -dr com.apple.quarantine /Applications/SnapTranslate.app`。
+> macOS 客户端目前只迁移了文本翻译、历史与文档翻译，截图/剪贴板等功能仍在 Windows 客户端上。
+
+## 从源码构建
 
 ```powershell
-# 从源码构建单文件 exe
+# Windows 单文件 exe（自包含，约 190 MB）
 .\scripts\publish-windows.ps1 -Runtime win-x64
-# 产物：artifacts\windows\win-x64\SnapTranslate.exe
+
+# macOS 应用包（需在 macOS 上执行）
+bash scripts/build-macos-helper.sh
+dotnet publish src/SnapTranslate.Desktop/SnapTranslate.Desktop.csproj -c Release -r osx-arm64 --self-contained true
+bash scripts/package-macos.sh osx-arm64 artifacts/publish/osx-arm64
 ```
 
-程序未做代码签名，首次运行 Windows 可能提示「已保护你的电脑」，选择「更多信息 → 仍要运行」即可。
-
-也可以直接用 GitHub Actions 构建：推一个 `v*` tag，[Release 工作流](.github/workflows/release.yml) 会同时产出
-Windows 单文件 exe 与 macOS arm64/x64 应用包，并自动附到 Release 页。
+推 `v*` tag 时，[Release 工作流](.github/workflows/release.yml) 会自动在两个平台各构建一次并把产物上传到 Release。
 
 ## 从源码构建与测试
 
