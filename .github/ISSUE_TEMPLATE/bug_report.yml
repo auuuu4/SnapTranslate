@@ -1,0 +1,58 @@
+name: 问题反馈
+description: 报告一个可以复现的 bug
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > 提交前请先搜索已有 issue。**日志和截图里的 API Key 请先删掉。**
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 设置页底部或 exe 属性里的版本号
+      placeholder: 1.0.0+0a62531
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: 系统
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 越具体越好，包括点了哪个按钮、用了哪个通道
+      placeholder: 1. 打开设置，把翻译通道改成 ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: 数据目录 logs 子目录下对应时间的片段，注意脱敏
+      render: text
+  - type: input
+    id: provider
+    attributes:
+      label: 使用的翻译通道
+      placeholder: 有道 AI / 自定义 API / 自动 ...
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我已在最新版本上复现，且日志里没有未脱敏的密钥
+          required: true

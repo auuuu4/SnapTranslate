@@ -1,0 +1,25 @@
+# 构建产物
+bin/
+obj/
+artifacts/
+publish-*/
+TestResults/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# 临时 / 本地数据
+*.tmp
+*.log
+*.db
+*.db-shm
+*.db-wal
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini

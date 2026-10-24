@@ -1,0 +1,76 @@
+<Window x:Class="SnapTranslate.TranslationTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="测试翻译" Width="820" Height="560" MinWidth="640" MinHeight="420"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{StaticResource SurfaceBrush}">
+  <Grid Margin="24,20,24,20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <StackPanel>
+      <TextBlock Text="测试翻译" Style="{StaticResource PageTitleTextStyle}" />
+      <TextBlock x:Name="ProviderText" Style="{StaticResource CaptionTextStyle}" Margin="0,5,0,0" />
+      <TextBlock Style="{StaticResource CaptionTextStyle}" Margin="0,4,0,0" TextWrapping="Wrap"
+                 Text="用设置页当前填写的参数直接发一次翻译请求；不会改动设置，也不写进翻译历史。" />
+    </StackPanel>
+
+    <Grid Grid.Row="1" Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}"
+              BorderThickness="1" CornerRadius="8">
+        <Grid>
+          <Grid.RowDefinitions><RowDefinition Height="44" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+          <Border Background="{StaticResource SurfaceMutedBrush}" BorderBrush="{StaticResource LineBrush}"
+                  BorderThickness="0,0,0,1" CornerRadius="8,8,0,0">
+            <TextBlock Text="原文" Style="{StaticResource SectionTitleTextStyle}" FontSize="13"
+                       VerticalAlignment="Center" Margin="14,0" />
+          </Border>
+          <TextBox x:Name="SourceText" Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top"
+                   Style="{StaticResource BorderlessTextBoxStyle}" Padding="14,12" />
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}"
+              BorderThickness="1" CornerRadius="8">
+        <Grid>
+          <Grid.RowDefinitions><RowDefinition Height="44" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+          <Border Background="{StaticResource AccentSoftBrush}" BorderBrush="{StaticResource AccentLineBrush}"
+                  BorderThickness="0,0,0,1" CornerRadius="8,8,0,0">
+            <Grid Margin="14,0">
+              <TextBlock Text="译文" Style="{StaticResource SectionTitleTextStyle}" FontSize="13" VerticalAlignment="Center" />
+              <Button Content="复制" Style="{StaticResource SubtleButtonStyle}" Padding="9,4" MinHeight="0"
+                      HorizontalAlignment="Right" VerticalAlignment="Center" Click="CopyTranslation_Click" />
+            </Grid>
+          </Border>
+          <TextBox x:Name="TranslationText" Grid.Row="1" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top"
+                   Style="{StaticResource BorderlessTextBoxStyle}" Padding="14,12" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Grid Grid.Row="2" Margin="0,14,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <TextBlock x:Name="StatusText" VerticalAlignment="Center" TextWrapping="Wrap"
+                 Foreground="{StaticResource MutedBrush}" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="12,0,0,0">
+        <Button Content="关闭" IsCancel="True" MinWidth="76" Margin="0,0,8,0" />
+        <Button x:Name="TranslateButton" Content="翻译" MinWidth="96" IsDefault="True"
+                Style="{StaticResource PrimaryButtonStyle}" Click="Translate_Click" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

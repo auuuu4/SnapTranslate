@@ -1,0 +1,185 @@
+<Window x:Class="SnapTranslate.ScreenshotTranslationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="截图翻译" WindowStyle="None" ResizeMode="NoResize"
+        ShowInTaskbar="False" Topmost="True" AllowsTransparency="True"
+        Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown">
+  <Window.Resources>
+    <Style x:Key="TranslationToolButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Width" Value="36" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Margin" Value="2,0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Foreground" Value="#F4F7F6" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#34433E" /></Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="ModeButton" TargetType="Button" BasedOn="{StaticResource TranslationToolButton}">
+      <Setter Property="Width" Value="50" />
+      <Setter Property="FontFamily" Value="{StaticResource TextFont}" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style x:Key="LanguageCombo" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+      <Setter Property="Width" Value="132" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Margin" Value="2,0" />
+      <Setter Property="Padding" Value="9,3,32,3" />
+      <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+      <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource LineStrongBrush}" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style x:Key="CaptureCloseButton" TargetType="Button">
+      <Setter Property="Width" Value="30" />
+      <Setter Property="Height" Value="30" />
+      <Setter Property="Foreground" Value="#F4F7F6" />
+      <Setter Property="Background" Value="#CC18211F" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Surface" Background="{TemplateBinding Background}"
+                    BorderBrush="#80FFFFFF" BorderThickness="1" CornerRadius="15">
+              <TextBlock Text="×" FontFamily="{StaticResource TextFont}" FontSize="16"
+                         Foreground="{TemplateBinding Foreground}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Surface" Property="Background" Value="#E6C0392B" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="ResultResizeHandle" TargetType="Thumb">
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="Panel.ZIndex" Value="20" />
+    </Style>
+  </Window.Resources>
+
+  <Grid x:Name="RootGrid">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <Grid x:Name="CaptureHost" Grid.Row="0" HorizontalAlignment="Left">
+      <Border x:Name="CaptureFrame" BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" Background="Transparent"
+              Cursor="SizeAll" MouseLeftButtonDown="CaptureFrame_MouseLeftButtonDown">
+        <Grid x:Name="CaptureSurface" ClipToBounds="True">
+          <Image x:Name="SourceImage" Stretch="Fill" SnapsToDevicePixels="True" Visibility="Collapsed" />
+          <Canvas x:Name="TextOverlay" Background="Transparent" IsHitTestVisible="False" />
+          <Grid x:Name="BusyOverlay" Background="Transparent" IsHitTestVisible="False">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#F218211F"
+                    BorderBrush="#6611856B" BorderThickness="1" CornerRadius="7" Padding="18,13">
+              <StackPanel>
+                <ProgressBar Width="156" Height="4" IsIndeterminate="True" Foreground="{StaticResource AccentBrush}" />
+                <TextBlock x:Name="BusyText" Text="正在识别..." Margin="0,8,0,0"
+                           Foreground="White" FontSize="12" TextAlignment="Center" />
+              </StackPanel>
+            </Border>
+          </Grid>
+          <Border x:Name="MoveHitSurface" Panel.ZIndex="10" Background="#01000000"
+                  Cursor="SizeAll" MouseLeftButtonDown="CaptureFrame_MouseLeftButtonDown" />
+        </Grid>
+      </Border>
+
+      <Thumb x:Name="ResizeNW" Tag="NorthWest" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeN" Tag="North" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Center" VerticalAlignment="Top" Cursor="SizeNS"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeNE" Tag="NorthEast" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeE" Tag="East" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Right" VerticalAlignment="Center" Cursor="SizeWE"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeSE" Tag="SouthEast" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeS" Tag="South" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Center" VerticalAlignment="Bottom" Cursor="SizeNS"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeSW" Tag="SouthWest" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+      <Thumb x:Name="ResizeW" Tag="West" Style="{StaticResource ResultResizeHandle}"
+             HorizontalAlignment="Left" VerticalAlignment="Center" Cursor="SizeWE"
+             DragStarted="ResizeHandle_DragStarted" DragDelta="ResizeHandle_DragDelta" DragCompleted="ResizeHandle_DragCompleted" />
+
+      <!-- 悬浮关闭按钮：贴在截图区右上角，工具条折行或被裁也不会丢 -->
+      <Button x:Name="CloseButton" Style="{StaticResource CaptureCloseButton}" Panel.ZIndex="30"
+              Margin="8" HorizontalAlignment="Right" VerticalAlignment="Top"
+              ToolTip="关闭 (Esc)" Click="Close_Click" />
+    </Grid>
+
+    <Border x:Name="TranslationToolbar" Grid.Row="1" Height="58" HorizontalAlignment="Left"
+            Background="#F518211F" BorderBrush="#465750" BorderThickness="1"
+            CornerRadius="8" MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
+      <WrapPanel x:Name="TranslationToolbarLayout" Margin="8,7" VerticalAlignment="Top">
+        <StackPanel x:Name="LanguageGroup" Orientation="Horizontal">
+          <ComboBox x:Name="SourceLanguageCombo" Style="{StaticResource LanguageCombo}"
+                    SelectionChanged="SourceLanguageCombo_SelectionChanged">
+            <ComboBoxItem Content="自动检测" Tag="auto" />
+            <ComboBoxItem Content="简体中文" Tag="zh" />
+            <ComboBoxItem Content="English" Tag="en" />
+            <ComboBoxItem Content="日本語" Tag="ja" />
+            <ComboBoxItem Content="한국어" Tag="ko" />
+            <ComboBoxItem Content="Français" Tag="fr" />
+            <ComboBoxItem Content="Deutsch" Tag="de" />
+            <ComboBoxItem Content="Español" Tag="es" />
+            <ComboBoxItem Content="Русский" Tag="ru" />
+          </ComboBox>
+          <TextBlock x:Name="LanguageArrow" Text="→" Foreground="#AEB6C0" FontSize="16"
+                     Margin="5,0" VerticalAlignment="Center" />
+          <ComboBox x:Name="TargetLanguageCombo" Style="{StaticResource LanguageCombo}"
+                    SelectionChanged="TargetLanguageCombo_SelectionChanged">
+            <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+            <ComboBoxItem Content="English" Tag="en" />
+            <ComboBoxItem Content="日本語" Tag="ja" />
+            <ComboBoxItem Content="한국어" Tag="ko" />
+            <ComboBoxItem Content="Français" Tag="fr" />
+            <ComboBoxItem Content="Deutsch" Tag="de" />
+            <ComboBoxItem Content="Español" Tag="es" />
+            <ComboBoxItem Content="Русский" Tag="ru" />
+          </ComboBox>
+        </StackPanel>
+
+        <StackPanel x:Name="ActionGroup" Orientation="Horizontal">
+          <Border x:Name="ModeSelector" Margin="8,0" Background="#26342F" BorderBrush="#465750" BorderThickness="1" CornerRadius="6">
+            <StackPanel Orientation="Horizontal">
+              <Button x:Name="OriginalModeButton" Content="原文" Style="{StaticResource ModeButton}" Click="OriginalMode_Click" />
+              <Button x:Name="TranslationModeButton" Content="译文" Style="{StaticResource ModeButton}" Click="TranslationMode_Click" />
+              <Button x:Name="CompareModeButton" Content="对照" Style="{StaticResource ModeButton}" Click="CompareMode_Click" />
+            </StackPanel>
+          </Border>
+          <Button x:Name="CopySourceButton" Width="70" Style="{StaticResource TranslationToolButton}"
+                  ToolTip="复制原文" Click="CopySource_Click" Content="复制原文" FontSize="12" />
+          <Button x:Name="CopyTranslationButton" Width="70" Style="{StaticResource TranslationToolButton}"
+                  ToolTip="复制译文" Click="CopyTranslation_Click" Content="复制译文" FontSize="12" />
+          <Button x:Name="RetryButton" Style="{StaticResource TranslationToolButton}" Content="↻"
+                  FontFamily="Segoe UI Symbol" FontSize="17" ToolTip="重新翻译" Click="Retry_Click" />
+        </StackPanel>
+
+        <TextBlock x:Name="StatusText" Width="146" Margin="4,0,8,0" VerticalAlignment="Center"
+                   Foreground="#AEB6C0" FontSize="12" TextTrimming="CharacterEllipsis" />
+      </WrapPanel>
+    </Border>
+  </Grid>
+</Window>

@@ -1,0 +1,43 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SnapTranslate.Desktop.App"
+             RequestedThemeVariant="Default">
+    <Application.Resources>
+        <SolidColorBrush x:Key="PageBrush" Color="#F5F6F7" />
+        <SolidColorBrush x:Key="InkBrush" Color="#202428" />
+        <SolidColorBrush x:Key="MutedBrush" Color="#697078" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#147D64" />
+        <SolidColorBrush x:Key="LineBrush" Color="#D7DADF" />
+        <SolidColorBrush x:Key="DangerBrush" Color="#B33A3A" />
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme />
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Inter, PingFang SC, Microsoft YaHei UI" />
+            <Setter Property="Background" Value="{StaticResource PageBrush}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="MinHeight" Value="34" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="14,8" />
+        </Style>
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.danger">
+            <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+        </Style>
+    </Application.Styles>
+</Application>

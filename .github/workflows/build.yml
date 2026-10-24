@@ -1,0 +1,77 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Test cross-platform core
+        run: dotnet test tests/SnapTranslate.Core.Tests/SnapTranslate.Core.Tests.csproj -c Release
+      - name: Render Avalonia UI headlessly
+        run: dotnet test tests/SnapTranslate.Desktop.Tests/SnapTranslate.Desktop.Tests.csproj -c Release
+      - name: Audit NuGet dependencies
+        run: dotnet list src/SnapTranslate.Core/SnapTranslate.Core.csproj package --vulnerable --include-transitive
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build Windows client and smoke tests
+        run: dotnet build tests/SnapTranslate.SmokeTest/SnapTranslate.SmokeTest.csproj -c Release
+      - name: Run Windows offline integration tests
+        run: dotnet run --project tests/SnapTranslate.SmokeTest/SnapTranslate.SmokeTest.csproj -c Release --no-build -- --offline
+      - name: Publish Windows x64
+        shell: pwsh
+        run: ./scripts/publish-windows.ps1 -Runtime win-x64
+      - name: Audit Windows dependencies
+        run: dotnet list SnapTranslate.csproj package --vulnerable --include-transitive
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SnapTranslate-win-x64
+          path: artifacts/windows/win-x64
+          if-no-files-found: error
+
+  macos:
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        rid: [osx-arm64, osx-x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build universal Vision helper
+        run: bash scripts/build-macos-helper.sh
+      - name: Publish macOS client
+        run: >-
+          dotnet publish src/SnapTranslate.Desktop/SnapTranslate.Desktop.csproj
+          -c Release -r ${{ matrix.rid }} --self-contained true
+          -p:UseAppHost=true -o artifacts/publish/${{ matrix.rid }}
+      - name: Package application bundle
+        run: bash scripts/package-macos.sh ${{ matrix.rid }} artifacts/publish/${{ matrix.rid }}
+      - name: Verify application bundle
+        run: >-
+          test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/MacOS/SnapTranslate
+          && test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/Resources/SnapTranslateVision
+          && codesign --verify --deep --strict artifacts/macos/${{ matrix.rid }}/SnapTranslate.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SnapTranslate-${{ matrix.rid }}
+          path: artifacts/macos/${{ matrix.rid }}/SnapTranslate-${{ matrix.rid }}.zip
+          if-no-files-found: error

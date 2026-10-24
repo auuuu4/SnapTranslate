@@ -1,0 +1,178 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="680"
+        x:Class="SnapTranslate.Desktop.MainWindow"
+        Title="SnapTranslate" Width="900" Height="680"
+        MinWidth="720" MinHeight="560" WindowStartupLocation="CenterScreen">
+  <Grid RowDefinitions="66,*,30" Background="{StaticResource PageBrush}">
+    <Border Grid.Row="0" Background="{StaticResource InkBrush}">
+      <Grid Margin="24,0" ColumnDefinitions="*,Auto">
+        <StackPanel VerticalAlignment="Center" Spacing="2">
+          <TextBlock Text="SnapTranslate" FontSize="22" FontWeight="SemiBold" Foreground="White" />
+          <TextBlock Text="macOS 桌面版" FontSize="11" Foreground="#B9C0C5" />
+        </StackPanel>
+        <TextBlock Grid.Column="1" Text="翻译 · OCR · 文档" VerticalAlignment="Center"
+                   Foreground="#D7DDE0" FontSize="12" />
+      </Grid>
+    </Border>
+
+    <TabControl x:Name="MainTabs" Grid.Row="1" Margin="16" Background="Transparent">
+      <TabItem Header="输入翻译">
+        <Grid Margin="10,14,10,6" RowDefinitions="*,Auto,*">
+          <TextBox x:Name="InputText" AcceptsReturn="True" TextWrapping="Wrap"
+                   Watermark="输入需要翻译的文本" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+          <Grid Grid.Row="1" Margin="0,8" ColumnDefinitions="Auto,150,*,Auto,Auto,Auto">
+            <TextBlock Text="目标语言" VerticalAlignment="Center" Margin="4,0,8,0" />
+            <ComboBox x:Name="QuickTargetCombo" Grid.Column="1" SelectedIndex="0">
+              <ComboBoxItem Content="自动" Tag="auto" />
+              <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+              <ComboBoxItem Content="English" Tag="en" />
+            </ComboBox>
+            <Button Grid.Column="3" Content="清空" Click="ClearInput_Click" Margin="4,0" />
+            <Button Grid.Column="4" Content="复制结果" Click="CopyInputResult_Click" Margin="4,0" />
+            <Button x:Name="TranslateButton" Grid.Column="5" Classes="accent" Content="翻译"
+                    Click="TranslateInput_Click" MinWidth="88" Margin="4,0" />
+          </Grid>
+          <TextBox x:Name="InputResultText" Grid.Row="2" AcceptsReturn="True" TextWrapping="Wrap"
+                   IsReadOnly="True" Watermark="翻译结果" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="截图">
+        <Grid Margin="24" RowDefinitions="*,Auto,Auto,Auto,*">
+          <StackPanel Grid.Row="1" HorizontalAlignment="Center" Spacing="10" Width="300">
+            <TextBlock Text="截图识别" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="macOS 将请求屏幕录制权限" Foreground="{StaticResource MutedBrush}"
+                       HorizontalAlignment="Center" />
+          </StackPanel>
+          <StackPanel Grid.Row="2" HorizontalAlignment="Center" Spacing="8" Width="300" Margin="0,22,0,0">
+            <Button Classes="accent" Content="截图并翻译" Click="ScreenshotTranslate_Click" />
+            <Button Content="截图 OCR" Click="ScreenshotOcr_Click" />
+          </StackPanel>
+          <TextBlock x:Name="ScreenshotStatus" Grid.Row="3" Margin="0,18,0,0"
+                     HorizontalAlignment="Center" Foreground="{StaticResource MutedBrush}"
+                     TextWrapping="Wrap" MaxWidth="520" TextAlignment="Center" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="文档任务">
+        <Grid Margin="10,14,10,6" RowDefinitions="Auto,*">
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+            <TextBlock x:Name="DocumentTaskCountText" VerticalAlignment="Center"
+                       Foreground="{StaticResource MutedBrush}" />
+            <Button Grid.Column="1" Content="清除已结束" Click="ClearCompletedDocumentTasks_Click" Margin="4,0" />
+            <Button Grid.Column="2" Classes="accent" Content="添加文件" Click="AddDocumentFiles_Click" Margin="4,0" />
+          </Grid>
+          <ListBox x:Name="DocumentTaskList" Grid.Row="1" SelectionMode="Single">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="2*,70,120,2*,Auto,Auto" Margin="8,7">
+                  <StackPanel Spacing="2">
+                    <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding SourcePath}" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                               TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="1" Text="{Binding Format}" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="3">
+                    <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100" Height="8" />
+                    <TextBlock Text="{Binding ProgressDisplay}" FontSize="11" HorizontalAlignment="Center" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="3" Text="{Binding StatusText}" VerticalAlignment="Center"
+                             TextTrimming="CharacterEllipsis" Margin="10,0" />
+                  <Button Grid.Column="4" Content="打开" Click="OpenDocumentOutput_Click"
+                          IsEnabled="{Binding CanOpen}" Margin="3,0" />
+                  <Button Grid.Column="5" Classes="danger" Content="取消" Click="CancelDocumentTask_Click"
+                          IsEnabled="{Binding CanCancel}" Margin="3,0" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="历史">
+        <Grid Margin="10,14,10,6" RowDefinitions="*,Auto">
+          <ListBox x:Name="HistoryList">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="110,2*,2*,120" Margin="8,7">
+                  <TextBlock Text="{Binding CreatedAt, StringFormat={}{0:MM-dd HH:mm}}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Source}" TextTrimming="CharacterEllipsis"
+                             TextWrapping="Wrap" MaxLines="2" MaxHeight="38" Margin="8,0" />
+                  <TextBlock Grid.Column="2" Text="{Binding Translation}" TextTrimming="CharacterEllipsis"
+                             TextWrapping="Wrap" MaxLines="2" MaxHeight="38" Margin="8,0" />
+                  <TextBlock Grid.Column="3" Text="{Binding Provider}" Foreground="{StaticResource MutedBrush}" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+            <Button Content="复制译文" Click="CopyHistory_Click" />
+            <Button Classes="danger" Content="清空历史" Click="ClearHistory_Click" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="设置">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <Grid Margin="26,18" ColumnDefinitions="170,*"
+                RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+            <TextBlock Grid.Row="0" Text="翻译方式" VerticalAlignment="Center" />
+            <ComboBox x:Name="ProviderCombo" Grid.Row="0" Grid.Column="1" Margin="0,4" SelectedIndex="0">
+              <ComboBoxItem Content="自动" Tag="Auto" />
+              <ComboBoxItem Content="腾讯 Transmart" Tag="Transmart" />
+              <ComboBoxItem Content="MyMemory" Tag="MyMemory" />
+              <ComboBoxItem Content="Google" Tag="Google" />
+              <ComboBoxItem Content="Ollama 本地模型" Tag="Ollama" />
+              <ComboBoxItem Content="有道 AI" Tag="Youdao" />
+            </ComboBox>
+            <TextBlock Grid.Row="1" Text="Ollama 地址" VerticalAlignment="Center" />
+            <TextBox x:Name="OllamaEndpointText" Grid.Row="1" Grid.Column="1" Margin="0,4" />
+            <TextBlock Grid.Row="2" Text="Ollama 模型" VerticalAlignment="Center" />
+            <TextBox x:Name="OllamaModelText" Grid.Row="2" Grid.Column="1" Margin="0,4" />
+            <TextBlock Grid.Row="3" Text="默认目标语言" VerticalAlignment="Center" />
+            <ComboBox x:Name="SettingsTargetCombo" Grid.Row="3" Grid.Column="1" Margin="0,4" SelectedIndex="0">
+              <ComboBoxItem Content="自动" Tag="auto" />
+              <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+              <ComboBoxItem Content="English" Tag="en" />
+            </ComboBox>
+            <TextBlock Grid.Row="4" Text="文档源语言" VerticalAlignment="Center" />
+            <ComboBox x:Name="DocumentSourceCombo" Grid.Row="4" Grid.Column="1" Margin="0,4" SelectedIndex="0">
+              <ComboBoxItem Content="自动识别" Tag="auto" />
+              <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+              <ComboBoxItem Content="English" Tag="en" />
+            </ComboBox>
+            <TextBlock Grid.Row="5" Text="文档目标语言" VerticalAlignment="Center" />
+            <ComboBox x:Name="DocumentTargetCombo" Grid.Row="5" Grid.Column="1" Margin="0,4" SelectedIndex="0">
+              <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+              <ComboBoxItem Content="English" Tag="en" />
+            </ComboBox>
+            <TextBlock Grid.Row="6" Text="文档输出目录" VerticalAlignment="Center" />
+            <Grid Grid.Row="6" Grid.Column="1" ColumnDefinitions="*,Auto" Margin="0,4">
+              <TextBox x:Name="DocumentOutputDirectoryText" Watermark="留空则输出到原文件目录" />
+              <Button Grid.Column="1" Content="选择" Click="BrowseDocumentOutputDirectory_Click" Margin="8,0,0,0" />
+            </Grid>
+            <TextBlock Grid.Row="7" Text="文档文件后缀" VerticalAlignment="Center" />
+            <TextBox x:Name="DocumentOutputSuffixText" Grid.Row="7" Grid.Column="1" Margin="0,4" />
+            <TextBlock Grid.Row="8" Text="文档并发请求数" VerticalAlignment="Center" />
+            <TextBox x:Name="DocumentTranslationConcurrencyText" Grid.Row="8" Grid.Column="1" Margin="0,4"
+                     Watermark="大于 0 的整数" />
+            <StackPanel Grid.Row="9" Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+              <Button Classes="accent" Content="保存设置" Click="SaveSettings_Click" />
+              <Button Content="测试翻译服务" Click="TestProvider_Click" />
+            </StackPanel>
+            <TextBlock x:Name="SettingsStatus" Grid.Row="10" Grid.Column="1" Margin="0,10,0,0"
+                       Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" />
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+
+    <Border Grid.Row="2" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+      <TextBlock x:Name="FooterStatus" Margin="20,0" VerticalAlignment="Center"
+                 Foreground="{StaticResource MutedBrush}" FontSize="11" Text="就绪" />
+    </Border>
+  </Grid>
+</Window>
