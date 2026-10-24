@@ -72,6 +72,9 @@ Windows 10 19041 及以上（64 位），不需要安装 .NET 运行时：
 
 程序未做代码签名，首次运行 Windows 可能提示「已保护你的电脑」，选择「更多信息 → 仍要运行」即可。
 
+也可以直接用 GitHub Actions 构建：推一个 `v*` tag，[Release 工作流](.github/workflows/release.yml) 会同时产出
+Windows 单文件 exe 与 macOS arm64/x64 应用包，并自动附到 Release 页。
+
 ## 从源码构建与测试
 
 需要 [.NET SDK 8.0.424](https://dotnet.microsoft.com/download)（`global.json` 已锁定版本）。

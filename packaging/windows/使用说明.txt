@@ -1,0 +1,37 @@
+SnapTranslate 使用说明
+=====================
+
+运行方式
+  双击 SnapTranslate.exe 即可，单文件、免安装，不需要装 .NET 运行时。
+  系统要求：Windows 10 19041 及以上（64 位）。
+
+第一次打开
+  默认走「有道 AI（内置免费）」，不用配置就能翻译。
+  翻译页左边原文、右边译文，标题栏上分别有「复制原文」「复制译文」。
+  设置页改完不用点保存，停顿一下会自动落盘。
+
+翻译通道
+  内置免费（无需配置）：有道 AI、有道 普通翻译、腾讯 Transmart、MyMemory、Google
+  自定义 API（需配置）：可建多条渠道，每条独立填名称 / 地址 / Key / 模型，
+    支持 Chat Completions、Responses、Messages 三种格式；本地模型（Ollama 等）也走这里。
+  自动：按「自动顺序」里配置的列表依次尝试。
+
+截图
+  选好区域后可标注、保存、贴图、复制、翻译或 OCR。
+  截图翻译窗口右上角有常显关闭按钮，Esc 也可以。
+  复制后的图片在剪贴板里同时有 DIB 和 PNG 格式，粘到微信/QQ/浏览器不会变成文件。
+
+默认快捷键（设置页都能改）
+  Ctrl+Alt+F 输入翻译    Ctrl+Alt+A 截图         Ctrl+Alt+D 截图翻译
+  Ctrl+Alt+C 静默 OCR    Ctrl+Alt+O 截图 OCR     Win+V 剪贴板历史
+  Ctrl+D 贴图
+
+数据位置
+  %APPDATA%\SnapTranslate（settings.json / history.json / Data\clipboard.db / logs）
+  换 exe 不会丢数据；彻底清理时退出程序后删掉该目录即可。
+  注意：settings.json 里的 API Key 是明文保存的。
+
+已知提示
+  程序未做代码签名，Windows SmartScreen 可能提示「已保护你的电脑」，
+  点「更多信息」→「仍要运行」即可。
+  有道等网页接口属非官方接入，上游调整时可能失效，可反馈日志。

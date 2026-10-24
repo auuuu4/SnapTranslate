@@ -63,4 +63,29 @@ dotnet run --project tests\SnapTranslate.SmokeTest\SnapTranslate.SmokeTest.cspro
 2. 界面相关改动用 `--render-*` 看一眼
 3. `dotnet build` 零警告（项目开了 `TreatWarningsAsErrors`）
 4. 更新 README 里变化的命令或参数
-5. 打 tag，附上 `artifacts\windows\win-x64\SnapTranslate.exe` 和 zip
+5. 打 tag 推送，等 CI 自动出包
+
+## CI 流水线
+
+仓库里有两条工作流，全部跑在 GitHub 的托管 runner 上（公开仓库免费）：
+
+| 工作流 | 触发 | 做什么 |
+| --- | --- | --- |
+| `build.yml` | push 到 main、PR、手动 | Ubuntu 跑核心单测与 Avalonia 无头渲染；Windows 跑冒烟测试并发布单文件 exe；macOS 出 arm64/x64 两个 .app 包，产物作为 Actions artifact 保留 |
+| `release.yml` | 推 `v*` tag、手动 | 两个平台同时构建，汇总成 `SnapTranslate-win-x64.zip`、`SnapTranslate-macos-arm64.zip`、`SnapTranslate-macos-x64.zip`，生成 `SHA256SUMS.txt` 并创建 GitHub Release |
+
+发版流程：
+
+```powershell
+git tag -a v1.0.1 -m "SnapTranslate 1.0.1"
+git push origin v1.0.1
+```
+
+推送后到 Actions 页面看 `Release` 工作流，约 5-8 分钟出包，Release 会自动建好。
+只想构建不出包时，用 `workflow_dispatch` 手动触发并把 tag 留空。
+
+> macOS 包没有 Apple 开发者签名，用户首次打开需要右键「打开」，或执行：
+> `xattr -dr com.apple.quarantine /Applications/SnapTranslate.app`
+
+> Windows 包没有代码签名，SmartScreen 会提示，需要用户点「仍要运行」。
+
