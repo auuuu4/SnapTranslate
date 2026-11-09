@@ -1,0 +1,78 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SnapTranslate.Desktop.Clipboard.ClipboardWindow"
+        Title="剪贴板历史" Width="880" Height="620" MinWidth="680" MinHeight="460"
+        WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
+  <Grid RowDefinitions="66,*,44,30" Background="{StaticResource PageBrush}">
+    <Border Grid.Row="0" Background="{StaticResource InkBrush}">
+      <Grid Margin="20,0" ColumnDefinitions="*,Auto">
+        <StackPanel VerticalAlignment="Center" Spacing="2">
+          <TextBlock Text="剪贴板历史" FontSize="20" FontWeight="SemiBold" Foreground="White" />
+          <TextBlock Text="自动记录最近 500 条剪贴板内容" FontSize="11" Foreground="#B9C0C5" />
+        </StackPanel>
+        <TextBlock x:Name="CountText" Grid.Column="1" Text="0 条" Foreground="#D7DDE0"
+                   VerticalAlignment="Center" FontSize="12" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" Margin="16,12,16,0" RowDefinitions="Auto,*">
+      <Grid ColumnDefinitions="*,170,Auto,Auto" Margin="0,0,0,10">
+        <TextBox x:Name="SearchText" Watermark="搜索文本、文件名或备注" />
+        <ComboBox x:Name="FilterCombo" Grid.Column="1" Margin="8,0,0,0" SelectedIndex="0">
+          <ComboBoxItem Content="全部" Tag="All" />
+          <ComboBoxItem Content="文本" Tag="Text" />
+          <ComboBoxItem Content="图片" Tag="Image" />
+          <ComboBoxItem Content="文件" Tag="Files" />
+        </ComboBox>
+        <Button x:Name="CopyButton" Grid.Column="2" Classes="accent" Content="复制"
+                Click="Copy_Click" Margin="8,0,0,0" MinWidth="76" />
+        <Button x:Name="FavoriteButton" Grid.Column="3" Content="收藏"
+                Click="Favorite_Click" Margin="8,0,0,0" MinWidth="88" />
+      </Grid>
+
+      <Grid Grid.Row="1">
+        <ListBox x:Name="ItemsList" SelectionMode="Single" DoubleTapped="ItemsList_DoubleTapped">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="64,*,140,28" Margin="8,8">
+                <Border Background="{StaticResource LineBrush}" CornerRadius="3" Padding="6,2"
+                        VerticalAlignment="Top" HorizontalAlignment="Left">
+                  <TextBlock Text="{Binding KindDisplay}" FontSize="11" />
+                </Border>
+                <TextBlock Grid.Column="1" Text="{Binding Preview}" TextWrapping="Wrap" MaxLines="2"
+                           Margin="8,0" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding CreatedAtDisplay}" FontSize="11"
+                           Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="3" Text="{Binding FavoriteDisplay}" FontSize="14"
+                           Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel x:Name="EmptyState" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+          <TextBlock Text="暂无剪贴板记录" FontSize="18" FontWeight="SemiBold"
+                     HorizontalAlignment="Center" Foreground="{StaticResource MutedBrush}" />
+          <TextBlock Text="复制任意文字、图片或文件后会出现在这里" FontSize="12"
+                     HorizontalAlignment="Center" Foreground="{StaticResource MutedBrush}" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+
+    <Grid Grid.Row="2" Margin="16,8,16,0" ColumnDefinitions="*,Auto,Auto,Auto">
+      <TextBlock x:Name="StatusText" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"
+                 FontSize="12" Text="就绪" TextTrimming="CharacterEllipsis" />
+      <Button x:Name="DeleteButton" Grid.Column="1" Classes="danger" Content="删除"
+              Click="Delete_Click" Margin="4,0" />
+      <Button x:Name="ClearButton" Grid.Column="2" Classes="danger" Content="清空历史"
+              Click="Clear_Click" Margin="4,0" />
+      <Button x:Name="CloseButton" Grid.Column="3" Content="关闭" Click="Close_Click" Margin="4,0" />
+    </Grid>
+
+    <Border Grid.Row="3" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+      <TextBlock Margin="20,0" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"
+                 FontSize="11" Text="双击条目可复制并关闭窗口 · Esc 关闭" />
+    </Border>
+  </Grid>
+</Window>

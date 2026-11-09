@@ -83,6 +83,8 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-${{ matrix.rid }}-
       - name: Build universal Vision helper
         run: bash scripts/build-macos-helper.sh
+      - name: Run desktop headless tests
+        run: dotnet test tests/SnapTranslate.Desktop.Tests/SnapTranslate.Desktop.Tests.csproj -c Release
       - name: Publish macOS client
         run: >-
           dotnet publish src/SnapTranslate.Desktop/SnapTranslate.Desktop.csproj
@@ -94,6 +96,7 @@ jobs:
         run: >-
           test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/MacOS/SnapTranslate
           && test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/Resources/SnapTranslateVision
+          && test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/Resources/SnapTranslatePasteboard
           && codesign --verify --deep --strict artifacts/macos/${{ matrix.rid }}/SnapTranslate.app
       - uses: actions/upload-artifact@v4
         with:

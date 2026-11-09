@@ -10,6 +10,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 rid="$1"
 publish_dir="$(cd "$2" && pwd)"
 helper="${3:-$root/artifacts/macos-tools/SnapTranslateVision}"
+pasteboard_helper="$root/artifacts/macos-tools/SnapTranslatePasteboard"
 artifact_dir="$root/artifacts/macos/$rid"
 app="$artifact_dir/SnapTranslate.app"
 
@@ -21,13 +22,18 @@ if [[ ! -x "$helper" ]]; then
   echo "Vision helper not found: $helper" >&2
   exit 1
 fi
+if [[ ! -x "$pasteboard_helper" ]]; then
+  echo "Pasteboard helper not found: $pasteboard_helper (先跑 scripts/build-macos-helper.sh)" >&2
+  exit 1
+fi
 
 rm -rf "$artifact_dir"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp -R "$publish_dir/." "$app/Contents/MacOS/"
 cp "$helper" "$app/Contents/Resources/SnapTranslateVision"
+cp "$pasteboard_helper" "$app/Contents/Resources/SnapTranslatePasteboard"
 cp "$root/packaging/macos/Info.plist" "$app/Contents/Info.plist"
-chmod 755 "$app/Contents/MacOS/SnapTranslate" "$app/Contents/Resources/SnapTranslateVision"
+chmod 755 "$app/Contents/MacOS/SnapTranslate" "$app/Contents/Resources/SnapTranslateVision" "$app/Contents/Resources/SnapTranslatePasteboard"
 
 if [[ -n "${MACOS_SIGN_IDENTITY:-}" ]]; then
   codesign --force --deep --options runtime --timestamp --sign "$MACOS_SIGN_IDENTITY" "$app"

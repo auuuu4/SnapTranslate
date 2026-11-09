@@ -55,10 +55,14 @@ text translation with multiple providers, clipboard history, and a global-hotkey
 | --- | --- | --- |
 | 输入翻译与历史 | ✅ | ✅ |
 | TXT/Markdown/CSV/HTML/Office/PDF 文档翻译 | ✅ | ✅ |
-| 截图 OCR 与翻译 | ✅ Windows OCR | ✅ 系统 Vision |
-| 截图标注、贴图 | ✅ | 暂未迁移 |
-| 剪贴板历史 | ✅ | 暂未迁移 |
-| 全局快捷键与托盘 | ✅ | 暂未迁移 |
+| 截图 + 标注 + 贴图 | ✅ | ✅ 自绘浮层 |
+| 截图 OCR / 截图翻译 | ✅ Windows OCR | ✅ 系统 Vision |
+| 剪贴板历史 | ✅ | ✅ NSPasteboard 轮询 |
+| 全局快捷键 | ✅ 键盘钩子 | ✅ Carbon，无需辅助功能权限 |
+| 托盘常驻 | ✅ | ✅ |
+| 主窗口始终置顶 | ✅ | ⏳ 设置项已存在，暂未生效 |
+
+平台实现细节（权限、辅助程序、已知限制）见 [docs/MACOS.md](docs/MACOS.md)。
 
 ## 下载
 

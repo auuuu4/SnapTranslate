@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SnapTranslate.Desktop.Capture.PinnedImageWindow"
+        Title="SnapTranslate 贴图"
+        SystemDecorations="None" CanResize="False" ShowInTaskbar="False"
+        Topmost="True" WindowStartupLocation="Manual"
+        ExtendClientAreaToDecorationsHint="False"
+        Background="#18211F">
+  <Border x:Name="PinFrame" Focusable="True" Background="#18211F"
+          BorderThickness="0" Padding="0">
+    <Image x:Name="PinnedImage" Stretch="Fill"/>
+  </Border>
+</Window>

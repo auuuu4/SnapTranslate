@@ -1,0 +1,108 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SnapTranslate.Desktop.CaptureTranslation.ScreenshotTranslationWindow"
+        Title="截图翻译" Width="840" Height="660" MinWidth="520" MinHeight="420"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource PageBrush}">
+  <Window.Styles>
+    <Style Selector="Button.mode">
+      <Setter Property="MinHeight" Value="30" />
+      <Setter Property="Padding" Value="14,4" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.mode.active">
+      <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,*,Auto,Auto">
+    <!-- 顶部标题栏：标题、选区信息与两个语言下拉 -->
+    <Border Grid.Row="0" Background="{StaticResource InkBrush}" Padding="18,12">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="3" VerticalAlignment="Center">
+          <TextBlock Text="截图翻译" FontSize="16" FontWeight="SemiBold" Foreground="White" />
+          <TextBlock x:Name="SubtitleText" Text="正在准备截图…" FontSize="11" Foreground="#B9C0C5"
+                     TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <ComboBox x:Name="SourceLanguageCombo" Width="126" />
+          <TextBlock Text="→" Foreground="#B9C0C5" FontSize="14" VerticalAlignment="Center" />
+          <ComboBox x:Name="TargetLanguageCombo" Width="126" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- 截图与半透明译文覆盖层 -->
+    <Grid Grid.Row="1" x:Name="ImageHost" Margin="14,14,14,0" ClipToBounds="True" Background="#161B1A">
+      <Image x:Name="SourceImage" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+      <Border x:Name="TranslationOverlay" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+              Background="#F2FFFFFF" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+              CornerRadius="8" Padding="16" IsVisible="False">
+        <Grid RowDefinitions="Auto,*">
+          <TextBlock x:Name="OverlayTitle" Text="译文" FontSize="12" FontWeight="SemiBold"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,0,0,8" />
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="8">
+              <StackPanel x:Name="ComparePanel" Spacing="6" IsVisible="False" />
+              <TextBlock x:Name="TranslationText" TextWrapping="Wrap" Foreground="{StaticResource InkBrush}" />
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <!-- 翻译中的进度遮罩 -->
+      <Border x:Name="BusyPanel" Background="#B3161B1A" IsVisible="False">
+        <Border Background="#F218211F" BorderBrush="#66147D64" BorderThickness="1" CornerRadius="8"
+                Padding="20,16" MinWidth="220" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <StackPanel Spacing="10">
+            <ProgressBar x:Name="BusyProgress" IsIndeterminate="True" Height="4"
+                         Foreground="{StaticResource AccentBrush}" />
+            <TextBlock x:Name="BusyText" Text="正在翻译…" Foreground="White" FontSize="12"
+                       HorizontalAlignment="Center" />
+          </StackPanel>
+        </Border>
+      </Border>
+
+      <!-- 翻译失败时的可读错误与重试 -->
+      <Border x:Name="ErrorPanel" IsVisible="False" Background="#F2FFFFFF"
+              BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="8"
+              Padding="18,14" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520">
+        <StackPanel Spacing="10">
+          <TextBlock Text="翻译失败" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" />
+          <TextBlock x:Name="ErrorText" TextWrapping="Wrap" Foreground="{StaticResource InkBrush}" />
+          <Button x:Name="ErrorRetryButton" Classes="accent" Content="重试" HorizontalAlignment="Left"
+                  Click="Retry_Click" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- 工具条：显示模式、复制、重试、关闭 -->
+    <Border Grid.Row="2" Background="{StaticResource PageBrush}" BorderBrush="{StaticResource LineBrush}"
+            BorderThickness="0,1,0,0" Padding="12,10">
+      <WrapPanel x:Name="TranslationToolbar" Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+        <Border Background="#E8EEEB" BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                CornerRadius="6" Padding="2">
+          <StackPanel Orientation="Horizontal" Spacing="2">
+            <Button x:Name="OriginalModeButton" Classes="mode" Content="原文" Click="OriginalMode_Click" />
+            <Button x:Name="TranslationModeButton" Classes="mode" Content="译文" Click="TranslationMode_Click" />
+            <Button x:Name="CompareModeButton" Classes="mode active" Content="对照" Click="CompareMode_Click" />
+          </StackPanel>
+        </Border>
+        <Button x:Name="CopySourceButton" Content="复制原文" Click="CopySource_Click" />
+        <Button x:Name="CopyTranslationButton" Content="复制译文" Click="CopyTranslation_Click" />
+        <Button x:Name="RetryButton" Content="重新翻译" Click="Retry_Click" />
+        <Button x:Name="CloseButton" Content="关闭" Click="Close_Click" />
+      </WrapPanel>
+    </Border>
+
+    <!-- 底部状态栏 -->
+    <Border Grid.Row="3" Background="{StaticResource PageBrush}" BorderBrush="{StaticResource LineBrush}"
+            BorderThickness="0,1,0,0">
+      <TextBlock x:Name="StatusText" Margin="14,8" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                 Text="正在准备截图…" TextTrimming="CharacterEllipsis" />
+    </Border>
+  </Grid>
+</Window>

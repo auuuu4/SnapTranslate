@@ -92,6 +92,7 @@ jobs:
         run: >-
           test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/MacOS/SnapTranslate
           && test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/Resources/SnapTranslateVision
+          && test -x artifacts/macos/${{ matrix.rid }}/SnapTranslate.app/Contents/Resources/SnapTranslatePasteboard
           && codesign --verify --deep --strict artifacts/macos/${{ matrix.rid }}/SnapTranslate.app
       - name: Rename artifact
         run: mv artifacts/macos/${{ matrix.rid }}/SnapTranslate-${{ matrix.rid }}.zip artifacts/SnapTranslate-${{ matrix.name }}.zip

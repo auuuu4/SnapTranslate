@@ -1,0 +1,147 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:capture="using:SnapTranslate.Desktop.Capture"
+        x:Class="SnapTranslate.Desktop.Capture.CaptureOverlayWindow"
+        Title="SnapTranslate 截图"
+        SystemDecorations="None" CanResize="False" ShowInTaskbar="False"
+        Topmost="True" WindowStartupLocation="Manual"
+        ExtendClientAreaToDecorationsHint="False"
+        Background="Black" Cursor="Cross">
+  <Window.Styles>
+    <Style Selector="Button.tool">
+      <Setter Property="MinHeight" Value="30"/>
+      <Setter Property="Height" Value="30"/>
+      <Setter Property="MinWidth" Value="34"/>
+      <Setter Property="Padding" Value="8,0"/>
+      <Setter Property="Margin" Value="2"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Background" Value="#1E2A26"/>
+      <Setter Property="Foreground" Value="#EDF3F1"/>
+      <Setter Property="BorderBrush" Value="#3B4A44"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <Style Selector="Button.tool.active">
+      <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+    <Style Selector="Button.swatch">
+      <Setter Property="Width" Value="22"/>
+      <Setter Property="Height" Value="22"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="Margin" Value="3"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="CornerRadius" Value="11"/>
+      <Setter Property="BorderBrush" Value="#B3FFFFFF"/>
+      <Setter Property="BorderThickness" Value="1.5"/>
+    </Style>
+    <Style Selector="Button.swatch.active">
+      <Setter Property="BorderBrush" Value="White"/>
+      <Setter Property="BorderThickness" Value="2.5"/>
+    </Style>
+    <Style Selector="TextBlock.toolbarHint">
+      <Setter Property="Foreground" Value="#D7E2DE"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="8,0"/>
+    </Style>
+  </Window.Styles>
+
+  <Grid x:Name="RootGrid" ClipToBounds="True">
+    <Image x:Name="ScreenImage" Stretch="Fill" IsHitTestVisible="False"/>
+    <capture:CaptureSurface x:Name="Surface" Focusable="True"/>
+
+    <Canvas x:Name="ChromeLayer">
+      <Border x:Name="SizeBadge" IsVisible="False" IsHitTestVisible="False"
+              Background="#F018211F" BorderBrush="#4A5B54" BorderThickness="1"
+              CornerRadius="4" Padding="8,3">
+        <TextBlock x:Name="SizeText" Foreground="#F2F6F5" FontSize="12"/>
+      </Border>
+
+      <TextBox x:Name="TextEditor" IsVisible="False" MinWidth="160" MinHeight="36"
+               AcceptsReturn="True" TextWrapping="Wrap" Padding="6"
+               Background="#F7FFFFFF" Foreground="#1E2328"
+               BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" FontSize="16"
+               KeyDown="TextEditor_KeyDown"/>
+
+      <Border x:Name="Toolbar" IsVisible="False" Background="#F01B2522"
+              BorderBrush="#42544D" BorderThickness="1" CornerRadius="8" Padding="6">
+        <WrapPanel x:Name="ToolPanel" Orientation="Horizontal">
+          <StackPanel x:Name="ReadyGroup" Orientation="Horizontal">
+            <TextBlock Classes="toolbarHint" Text="拖动鼠标框选截图区域，Esc 取消"/>
+          </StackPanel>
+
+          <StackPanel x:Name="ToolGroup" Orientation="Horizontal" IsVisible="False">
+            <Button x:Name="SelectToolButton" Classes="tool" Content="↖" Tag="Select"
+                    Click="ToolButton_Click" ToolTip.Tip="选择与移动选区"/>
+            <Button x:Name="RectangleToolButton" Classes="tool" Content="□" Tag="Rectangle"
+                    Click="ToolButton_Click" ToolTip.Tip="矩形"/>
+            <Button x:Name="EllipseToolButton" Classes="tool" Content="○" Tag="Ellipse"
+                    Click="ToolButton_Click" ToolTip.Tip="椭圆"/>
+            <Button x:Name="ArrowToolButton" Classes="tool" Content="→" Tag="Arrow"
+                    Click="ToolButton_Click" ToolTip.Tip="箭头"/>
+            <Button x:Name="PenToolButton" Classes="tool" Content="✎" Tag="Pen"
+                    Click="ToolButton_Click" ToolTip.Tip="画笔"/>
+            <Button x:Name="TextToolButton" Classes="tool" Content="T" Tag="Text"
+                    Click="ToolButton_Click" ToolTip.Tip="文字"/>
+            <Button x:Name="MosaicToolButton" Classes="tool" Content="▦" Tag="Mosaic"
+                    Click="ToolButton_Click" ToolTip.Tip="马赛克"/>
+          </StackPanel>
+
+          <StackPanel x:Name="ColorGroup" Orientation="Horizontal" IsVisible="False"
+                      VerticalAlignment="Center">
+            <Button x:Name="RedColorButton" Classes="swatch" Tag="#E53935" Background="#E53935"
+                    Click="ColorButton_Click" ToolTip.Tip="红色"/>
+            <Button x:Name="YellowColorButton" Classes="swatch" Tag="#F5B400" Background="#F5B400"
+                    Click="ColorButton_Click" ToolTip.Tip="黄色"/>
+            <Button x:Name="GreenColorButton" Classes="swatch" Tag="#18A572" Background="#18A572"
+                    Click="ColorButton_Click" ToolTip.Tip="绿色"/>
+            <Button x:Name="BlueColorButton" Classes="swatch" Tag="#2389DA" Background="#2389DA"
+                    Click="ColorButton_Click" ToolTip.Tip="蓝色"/>
+            <Button x:Name="WhiteColorButton" Classes="swatch" Tag="#FFFFFF" Background="#FFFFFF"
+                    Click="ColorButton_Click" ToolTip.Tip="白色"/>
+          </StackPanel>
+
+          <StackPanel x:Name="HistoryGroup" Orientation="Horizontal" IsVisible="False">
+            <Button x:Name="UndoButton" Classes="tool" Content="↶" Click="Undo_Click"
+                    ToolTip.Tip="撤销（Ctrl / ⌘ + Z）"/>
+            <Button x:Name="RedoButton" Classes="tool" Content="↷" Click="Redo_Click"
+                    ToolTip.Tip="重做（Ctrl / ⌘ + Shift + Z）"/>
+          </StackPanel>
+
+          <StackPanel x:Name="ActionGroup" Orientation="Horizontal" IsVisible="False">
+            <Button x:Name="CopyButton" Classes="tool" Content="复制" Click="Copy_Click"
+                    ToolTip.Tip="复制到剪贴板"/>
+            <Button x:Name="SaveButton" Classes="tool" Content="保存" Click="Save_Click"
+                    ToolTip.Tip="保存为 PNG"/>
+            <Button x:Name="OcrButton" Classes="tool" Content="OCR" Click="Ocr_Click"
+                    ToolTip.Tip="识别文字"/>
+            <Button x:Name="TranslateButton" Classes="tool" Content="翻译" Click="Translate_Click"
+                    ToolTip.Tip="识别并翻译"/>
+            <Button x:Name="PinButton" Classes="tool" Content="贴图" Click="Pin_Click"
+                    ToolTip.Tip="贴到屏幕"/>
+          </StackPanel>
+
+          <StackPanel x:Name="CancelGroup" Orientation="Horizontal">
+            <Button x:Name="CancelButton" Classes="tool" Content="取消" Click="Cancel_Click"
+                    ToolTip.Tip="取消截图（Esc）"/>
+          </StackPanel>
+
+          <StackPanel x:Name="ConfirmGroup" Orientation="Horizontal" IsVisible="False">
+            <Button x:Name="CompleteButton" Classes="tool active" Content="完成" Click="Complete_Click"
+                    ToolTip.Tip="完成（Enter）"/>
+          </StackPanel>
+        </WrapPanel>
+      </Border>
+
+      <Border x:Name="StatusBar" IsVisible="False" IsHitTestVisible="False"
+              Background="#E0121A17" BorderBrush="#B33A3A" BorderThickness="1"
+              CornerRadius="4" Padding="10,5">
+        <TextBlock x:Name="StatusText" Foreground="#FFD9D4" FontSize="12"
+                   TextWrapping="Wrap" MaxWidth="520"/>
+      </Border>
+    </Canvas>
+  </Grid>
+</Window>

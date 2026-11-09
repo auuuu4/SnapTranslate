@@ -56,6 +56,10 @@ public sealed class ChatApiProfile
     public string DisplayLabel =>
         string.IsNullOrWhiteSpace(Name) ? "未命名渠道" : Name.Trim();
 
+    /// <summary>下拉/列表里展示的接口格式名，不参与序列化。</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string FormatDisplay => TranslationProviderCatalog.FormatDisplayName(Format);
+
     public ChatApiProfile Clone() => new()
     {
         Id = Id,

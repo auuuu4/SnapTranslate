@@ -2,6 +2,24 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [未发布]
+
+### 新增（macOS 客户端补齐到与 Windows 同级）
+
+- 截图：全屏抓取 → 自绘浮层框选、移动、缩放
+- 标注：矩形、椭圆、箭头、画笔、文字、马赛克，撤销/重做，5 种颜色
+- 截图结果：复制 / 保存 PNG / 贴图（Topmost）/ OCR / 截图翻译
+- 截图翻译窗口：原文 / 译文 / 对照三种模式，语言切换、重新翻译、失败重试
+- 剪贴板历史：NSPasteboard 轮询 + SQLite 存储，搜索、类型筛选、收藏、备注、写回剪贴板
+- 全局快捷键：Carbon RegisterEventHotKey（不需要辅助功能权限），设置页可编辑并显示注册结果
+- 托盘常驻：显示主窗口 / 剪贴板历史 / 退出，关闭窗口不退出进程
+- 设置页：通道改由 TranslationProviderCatalog 统一生成，支持自定义 API 多渠道、翻译提示词、七项快捷键
+
+### 变更
+
+- macOS OCR 抽成 `ITextRecognizer`，截图流程改为「抓屏 → 浮层 → 分发」
+- macOS 打包新增 Swift 剪贴板辅助程序 SnapTranslatePasteboard
+
 ## [1.0.0] - 2026-10-19
 
 首个公开发布版本。
