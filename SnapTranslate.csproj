@@ -12,6 +12,7 @@
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
     <AssemblyName>SnapTranslate</AssemblyName>
     <RootNamespace>SnapTranslate</RootNamespace>
+    <Version>1.1.0</Version>
     <NoWarn>$(NoWarn);WFAC010</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>

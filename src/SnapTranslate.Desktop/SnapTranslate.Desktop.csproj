@@ -8,6 +8,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>SnapTranslate</AssemblyName>
     <RootNamespace>SnapTranslate.Desktop</RootNamespace>
+    <Version>1.1.0</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
